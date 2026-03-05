@@ -66,7 +66,7 @@ engine_settings:
   no_graphics_monitor: false
 environment_parameters: null
 checkpoint_settings:
-  run_id: Maze_PPO_01
+  run_id: Maze_PPO_01_Simple
   initialize_from: null
   load_model: false
   resume: false

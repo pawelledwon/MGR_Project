@@ -43,7 +43,11 @@ public class MazeAgent : Agent
         float rotate = actions.DiscreteActions[1] == 1 ? 1f : (actions.DiscreteActions[1] == 2 ? -1f : 0f);
 
         transform.Rotate(Vector3.up, rotate * rotationSpeed * Time.fixedDeltaTime);
-        rb.MovePosition(transform.position + transform.forward * moveForward * moveSpeed * Time.fixedDeltaTime);
+        rb.linearVelocity = new Vector3(
+            (transform.forward * moveForward * moveSpeed).x,
+            rb.linearVelocity.y,
+            (transform.forward * moveForward * moveSpeed).z
+        );
 
         AddReward(-0.001f);
 
@@ -59,9 +63,7 @@ public class MazeAgent : Agent
     {
         if (collision.gameObject.CompareTag("Wall"))
         {
-            SetReward(-1.0f);   
-
-            EndEpisode();
+            AddReward(-0.01f);
         }
     }
 

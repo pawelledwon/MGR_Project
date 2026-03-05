@@ -107,7 +107,7 @@ public class MazeGenerator : MonoBehaviour
         if (agent != null && target != null && pathMazes.Count > 0)
         {
             agent.localPosition = new Vector3(1, 0.5f, 1);
-            int randomTargetIndex = rnd.Next(pathMazes.Count / 2, pathMazes.Count);
+            int randomTargetIndex = rnd.Next(2, pathMazes.Count);
             target.localPosition = pathMazes[randomTargetIndex];
         }
     }
