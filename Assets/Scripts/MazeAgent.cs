@@ -50,13 +50,11 @@ public class MazeAgent : Agent
         lastGridZ = -1;
     }
 
-    // Converts world position to grid coordinates
     private Vector2Int GetGridPos(Vector3 worldPos)
     {
         int x = Mathf.RoundToInt(worldPos.x);
         int y = Mathf.RoundToInt(worldPos.z);
 
-        // Clamp to array bounds so we never go out of range
         x = Mathf.Clamp(x, 0, mazeGenerator.width - 1);
         y = Mathf.Clamp(y, 0, mazeGenerator.height - 1);
 
@@ -108,10 +106,10 @@ public class MazeAgent : Agent
 
         // Distance shaping
         float currentDistance = Vector3.Distance(transform.position, target.position);
-        float distanceDelta = previousDistance - currentDistance;
+        //float distanceDelta = previousDistance - currentDistance;
 
-        float maxDist = Mathf.Sqrt(mazeGenerator.width * mazeGenerator.width + mazeGenerator.height * mazeGenerator.height);
-        AddReward((distanceDelta / maxDist) * 0.5f);
+        //float maxDist = Mathf.Sqrt(mazeGenerator.width * mazeGenerator.width + mazeGenerator.height * mazeGenerator.height);
+        //AddReward((distanceDelta / maxDist) * 0.5f);
 
         previousDistance = currentDistance;
 
@@ -120,9 +118,9 @@ public class MazeAgent : Agent
         if (gridPos.x != lastGridX || gridPos.y != lastGridZ)
         {
             if (visitCounts[gridPos.x, gridPos.y] == 0)
-                AddReward(0.005f);
+                AddReward(0.02f);
             else
-                AddReward(-0.0005f);
+                AddReward(-0.005f);
 
             visitCounts[gridPos.x, gridPos.y]++;
             lastGridX = gridPos.x;
