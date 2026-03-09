@@ -6,14 +6,18 @@ using System.Collections.Generic;
 public class MazeGenerator : MonoBehaviour
 {
     [Header("Wymiary Labiryntu (Musz¹ byæ NIEPARZYSTE)")]
-    public int width = 11;
-    public int height = 11;
     public Material brick;
     public Material floorMaterial;
+
+    public int width = 11;
+    public int height = 11;
 
     [Header("ML-Agents Obiekty")]
     public Transform agent;
     public Transform target;
+
+    [Header("Statystyki (Curriculum Learning)")]
+    public int targetsCollected = 0;
 
     private int[,] Maze;
     private List<Vector3> pathMazes = new List<Vector3>();
@@ -40,6 +44,11 @@ public class MazeGenerator : MonoBehaviour
                 throw new ArgumentException("The current square must not be both on an even X-axis and an even Y-axis");
             }
         }
+    }
+
+    void Start()
+    {
+        GenerateMaze();
     }
 
     public void GenerateMaze()
@@ -103,13 +112,7 @@ public class MazeGenerator : MonoBehaviour
             }
         }
 
-        // 5. Respawn Agenta i Celu
-        if (agent != null && target != null && pathMazes.Count > 0)
-        {
-            agent.localPosition = new Vector3(1, 0.5f, 1);
-            int randomTargetIndex = rnd.Next(2, pathMazes.Count);
-            target.localPosition = pathMazes[randomTargetIndex];
-        }
+        RespawnAgentAndTarget();
     }
 
     public int[,] CreateMaze()
@@ -170,5 +173,29 @@ public class MazeGenerator : MonoBehaviour
     {
         // Przywrócono oryginalne granice z Twojego skryptu
         return p.x >= 0 && p.y >= 0 && p.x < width && p.y < height;
+    }
+
+    public void TargetReached()
+    {
+        targetsCollected++;
+    }
+
+    public void RespawnAgentAndTarget()
+    {
+        if (agent != null && target != null && pathMazes.Count > 0)
+        {
+            // Random agent spawn
+            int randomAgentIndex = rnd.Next(0, pathMazes.Count);
+            agent.localPosition = pathMazes[randomAgentIndex];
+
+            // Random target spawn — ensure it's not on the same tile as agent
+            int randomTargetIndex;
+            do
+            {
+                randomTargetIndex = rnd.Next(0, pathMazes.Count);
+            } while (randomTargetIndex == randomAgentIndex);
+
+            target.localPosition = pathMazes[randomTargetIndex];
+        }
     }
 }
