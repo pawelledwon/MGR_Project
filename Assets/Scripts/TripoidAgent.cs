@@ -7,11 +7,17 @@ public class TripodAgent : Agent
 {
     [Header("Fizyka Robota")]
     public Rigidbody bodyRigidbody;
-    public HingeJoint[] swingJoints = new HingeJoint[3]; // LegRoot - forward/back
-    public HingeJoint[] liftJoints = new HingeJoint[3];  // LegCapsule - up/down
+    public HingeJoint[] swingJoints = new HingeJoint[3]; 
+    public HingeJoint[] liftJoints = new HingeJoint[3];
 
     [Header("Parametry Uczenia")]
     public float legMovementLimit = 60f;
+
+    [Header("Cel")]
+    public float arenaSize = 10f;
+    public GameObject targetPrefab;   
+    private GameObject targetInstance;
+    private Transform target;
 
     private Vector3 startingPosition;
     private Quaternion startingRotation;
@@ -22,6 +28,10 @@ public class TripodAgent : Agent
     private Quaternion[] startingLiftRotations;
 
     private bool isTouchingGround = false;
+    private float previousDistanceToTarget;
+
+    private Rigidbody[] swingRbs = new Rigidbody[3];
+    private Rigidbody[] liftRbs = new Rigidbody[3];
 
     public override void Initialize()
     {
@@ -39,32 +49,48 @@ public class TripodAgent : Agent
             startingSwingRotations[i] = swingJoints[i].transform.localRotation;
             startingLiftPositions[i] = liftJoints[i].transform.localPosition;
             startingLiftRotations[i] = liftJoints[i].transform.localRotation;
+
+            swingRbs[i] = swingJoints[i].GetComponent<Rigidbody>();
+            liftRbs[i] = liftJoints[i].GetComponent<Rigidbody>();
         }
     }
 
     public override void OnEpisodeBegin()
     {
-        // Zero velocities FIRST while still dynamic
+        if (targetInstance != null)
+        {
+            Destroy(targetInstance);
+            targetInstance = null;
+            target = null;
+        }
+
+        bodyRigidbody.isKinematic = false;
+
+        for (int i = 0; i < 3; i++)
+        {
+            swingRbs[i].isKinematic = false;
+            liftRbs[i].isKinematic = false;
+        }
+
         bodyRigidbody.linearVelocity = Vector3.zero;
         bodyRigidbody.angularVelocity = Vector3.zero;
 
         for (int i = 0; i < 3; i++)
         {
-            swingJoints[i].GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
-            swingJoints[i].GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
-            liftJoints[i].GetComponent<Rigidbody>().linearVelocity = Vector3.zero;
-            liftJoints[i].GetComponent<Rigidbody>().angularVelocity = Vector3.zero;
+            swingRbs[i].linearVelocity = Vector3.zero;
+            swingRbs[i].angularVelocity = Vector3.zero;
+            liftRbs[i].linearVelocity = Vector3.zero;
+            liftRbs[i].angularVelocity = Vector3.zero;
         }
 
-        // Go kinematic for safe teleport
         bodyRigidbody.isKinematic = true;
+
         for (int i = 0; i < 3; i++)
         {
-            swingJoints[i].GetComponent<Rigidbody>().isKinematic = true;
-            liftJoints[i].GetComponent<Rigidbody>().isKinematic = true;
+            swingRbs[i].isKinematic = true;
+            liftRbs[i].isKinematic = true;
         }
 
-        // Reposition
         transform.localPosition = startingPosition;
         transform.localRotation = startingRotation;
 
@@ -86,7 +112,39 @@ public class TripodAgent : Agent
 
         StartCoroutine(ReenablePhysics());
         isTouchingGround = false;
+
+        SpawnTarget();
     }
+
+    private void SpawnTarget()
+    {
+        if (targetInstance != null)
+        {
+            Destroy(targetInstance);
+            targetInstance = null;
+        }
+
+        float halfArena = arenaSize / 2f;
+
+        Vector3 localSpawnPos = new Vector3(
+            Random.Range(-halfArena, halfArena),
+            startingPosition.y,
+            Random.Range(-halfArena, halfArena)
+        );
+
+        Vector3 worldSpawnPos = transform.parent != null
+            ? transform.parent.TransformPoint(localSpawnPos)
+            : localSpawnPos;
+
+        targetInstance = Instantiate(targetPrefab, worldSpawnPos, Quaternion.identity);
+
+        if (transform.parent != null)
+            targetInstance.transform.SetParent(transform.parent);
+
+        target = targetInstance.transform;
+        previousDistanceToTarget = Vector3.Distance(transform.position, target.position);
+    }
+
 
     private System.Collections.IEnumerator ReenablePhysics()
     {
@@ -101,50 +159,61 @@ public class TripodAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        // Body state - 8 values
-        sensor.AddObservation(bodyRigidbody.linearVelocity);   // 3
-        sensor.AddObservation(bodyRigidbody.angularVelocity);  // 3
-        sensor.AddObservation(transform.forward);              // 3
-        sensor.AddObservation(transform.up);                   // 3
+        sensor.AddObservation(bodyRigidbody.linearVelocity);   
+        sensor.AddObservation(bodyRigidbody.angularVelocity);  
+        sensor.AddObservation(transform.forward);             
+        sensor.AddObservation(transform.up);                   
 
-        // Ground contact - 1 value
         sensor.AddObservation(isTouchingGround ? 1.0f : 0.0f);
 
-        // Per leg: swing position, lift position, swing velocity, lift velocity - 4 values x 3 legs = 12
+        if (target != null)
+        {
+            Vector3 toTarget = target.position - transform.position;
+            sensor.AddObservation(toTarget.normalized);           
+            sensor.AddObservation(toTarget.magnitude);            
+        }
+
         for (int i = 0; i < 3; i++)
         {
             sensor.AddObservation(swingJoints[i].spring.targetPosition / legMovementLimit);
             sensor.AddObservation(liftJoints[i].spring.targetPosition / legMovementLimit);
-            sensor.AddObservation(swingJoints[i].GetComponent<Rigidbody>().angularVelocity);
-            sensor.AddObservation(liftJoints[i].GetComponent<Rigidbody>().angularVelocity);
+            sensor.AddObservation(swingRbs[i].angularVelocity);                            
+            sensor.AddObservation(liftRbs[i].angularVelocity);
         }
-        // Total: 12 + 1 + 12 = 25... update Space Size to 25 in Inspector
-        // 3+3+3+3 = 12 body, 1 ground, 3*(1+1+3+3) = 27 legs = 40 total
-        // Set Space Size to 40 in Behavior Parameters
     }
 
     public override void OnActionReceived(ActionBuffers actions)
     {
-        // 6 actions: swing0, lift0, swing1, lift1, swing2, lift2
         for (int i = 0; i < 3; i++)
         {
             ApplyLegAction(swingJoints[i], actions.ContinuousActions[i * 2]);
             ApplyLegAction(liftJoints[i], actions.ContinuousActions[i * 2 + 1]);
         }
 
-        float forwardVelocity = bodyRigidbody.linearVelocity.z;
-        AddReward(Mathf.Clamp(forwardVelocity, 0f, 2f) * 0.05f);
+        if (target != null)
+        {
+            float currentDistance = Vector3.Distance(transform.position, target.position);
+            float deltaDistance = previousDistanceToTarget - currentDistance;
+
+            AddReward(deltaDistance * 5.0f);               
+            AddReward(-0.001f * currentDistance);           
+            previousDistanceToTarget = currentDistance;
+
+            if (currentDistance < 1.5f)
+            {
+                AddReward(5f);
+                EndEpisode();
+            }
+        }
 
         if (isTouchingGround)
             AddReward(-0.02f);
-        else
-            AddReward(0.01f);
 
         AddReward(-0.001f);
 
         if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 10f))
         {
-            if (hit.distance < 0.3f)
+            if (hit.distance < 0.5f)
             {
                 SetReward(-1f);
                 EndEpisode();
@@ -163,6 +232,24 @@ public class TripodAgent : Agent
     {
         if (collision.gameObject.CompareTag("Floor"))
             isTouchingGround = true;
+
+        if (collision.gameObject.CompareTag("Wall"))
+        {
+            AddReward(-0.5f);
+            EndEpisode();
+        }
+
+        if (collision.gameObject.CompareTag("Goal"))
+        {
+            AddReward(5f);
+            EndEpisode();
+        }
+    }
+
+    public void OnLegHitWall()
+    {
+        AddReward(-0.5f);
+        EndEpisode();
     }
 
     private void OnCollisionExit(Collision collision)

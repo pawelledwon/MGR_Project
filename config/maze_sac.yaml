@@ -1,24 +1,21 @@
 behaviors:
-  MazeAgent:                        # must match Behavior Name in Unity Inspector
-    trainer_type: sac               # which algorithm to use (sac or ppo)
+  MazeAgent:
+    trainer_type: sac
     hyperparameters:
-      learning_rate: 3.0e-4         # how big each gradient update step is — too high = unstable, too low = slow
-      learning_rate_schedule: constant  # keeps learning rate the same throughout (ppo uses linear decay)
-      batch_size: 256               # how many experiences to sample from buffer per update — smaller = noisier but more frequent learning
-      buffer_size: 200000          # max experiences stored in replay buffer — old ones get overwritten when full
-      buffer_init_steps: 2000      # how many random steps to take BEFORE any learning starts — fills buffer with initial data
-      tau: 0.005                    # how fast target networks update — small value = stable but slow to track policy changes
-      steps_per_update: 5        # collect this many steps then do one gradient update — your current value is too high, should be 10
-      init_entcoef: 0.1           # initial entropy coefficient — controls how much SAC explores randomly at start, lower = less random
-      reward_signal_steps_per_update: 1  # how often reward model updates relative to policy — 1 means every update
+      learning_rate: 3.0e-4
+      batch_size: 512           # larger batch = fewer updates = faster
+      buffer_size: 50000
+      init_entcoef: 0.01
+      tau: 0.005
+      steps_per_update: 20      # key change
     network_settings:
-      normalize: true               # normalizes observations to mean=0 std=1 — important for mixed scale inputs like yours
-      hidden_units: 256             # neurons per hidden layer — bigger = more capacity but slower
-      num_layers: 2                 # how many hidden layers — 2 is standard for most problems
+      normalize: true
+      hidden_units: 128         # reduce from 256 — maze doesn't need huge network
+      num_layers: 2
     reward_signals:
-      extrinsic:                    # rewards coming from your C# code (AddReward, SetReward)
-        gamma: 0.99                 # discount factor — how much future rewards matter vs immediate ones, 0.99 = cares a lot about future
-        strength: 1.0               # multiplier on all extrinsic rewards — 1.0 means no scaling
-    max_steps: 500000              # total environment steps before training stops
-    time_horizon: 128               # how many steps to collect before computing advantage estimates
-    summary_freq: 10000             # how often to write to TensorBoard — every 10k steps
+      extrinsic:
+        gamma: 0.99
+        strength: 1.0
+    max_steps: 1000000
+    time_horizon: 128
+    summary_freq: 10000

@@ -23,7 +23,7 @@ public class MazeGenerator : MonoBehaviour
     private List<Vector3> pathMazes = new List<Vector3>();
     private Stack<Vector2> _tiletoTry = new Stack<Vector2>();
     private List<Vector2> offsets = new List<Vector2> { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
-    private System.Random rnd = new System.Random(Guid.NewGuid().GetHashCode());
+    private System.Random rnd = new System.Random(42);
 
     private GameObject wallsContainer;
 
