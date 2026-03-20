@@ -27,6 +27,9 @@ public class MazeGenerator : MonoBehaviour
 
     private GameObject wallsContainer;
 
+    [Header("Regeneracja Labiryntu")]
+    public bool regenerateEachEpisode = true;
+
     private Vector2 _currentTile;
     public Vector2 CurrentTile
     {
@@ -48,11 +51,14 @@ public class MazeGenerator : MonoBehaviour
 
     void Start()
     {
-        GenerateMaze();
+        GeneratePillarGrid();
     }
 
     public void GenerateMaze()
     {
+        if(regenerateEachEpisode)
+            rnd = new System.Random(Guid.NewGuid().GetHashCode());
+
         // 1. Czyszczenie poprzedniego labiryntu
         if (wallsContainer != null) Destroy(wallsContainer);
         wallsContainer = new GameObject("WallsContainer");
@@ -112,7 +118,49 @@ public class MazeGenerator : MonoBehaviour
             }
         }
 
-        RespawnAgentAndTarget();
+        PlaceAgentAndTarget();
+    }
+
+    public void GeneratePillarGrid()
+    {
+        if (wallsContainer != null) Destroy(wallsContainer);
+        wallsContainer = new GameObject("WallsContainer");
+        wallsContainer.transform.parent = this.transform;
+        wallsContainer.transform.localPosition = Vector3.zero;
+
+        pathMazes.Clear();
+
+        // floor
+        GameObject floor = GameObject.CreatePrimitive(PrimitiveType.Cube);
+        floor.name = "Floor";
+        floor.transform.parent = wallsContainer.transform;
+        floor.transform.localPosition = new Vector3((width - 1) / 2f, -0.5f, (height - 1) / 2f);
+        floor.transform.localScale = new Vector3(width, 1, height);
+        if (floorMaterial != null)
+            floor.GetComponent<Renderer>().material = floorMaterial;
+
+        // place pillars on even coordinates only
+        for (int x = 0; x < width; x++)
+        {
+            for (int z = 0; z < height; z++)
+            {
+                if (x % 2 == 1 && z % 2 == 1) // pillar positions
+                {
+                    GameObject pillar = GameObject.CreatePrimitive(PrimitiveType.Cube);
+                    pillar.transform.parent = wallsContainer.transform;
+                    pillar.transform.localPosition = new Vector3(x, 0.5f, z);
+                    pillar.tag = "Wall";
+                    if (brick != null)
+                        pillar.GetComponent<Renderer>().material = brick;
+                }
+                else
+                {
+                    pathMazes.Add(new Vector3(x, 0.5f, z));
+                }
+            }
+        }
+
+        PlaceAgentAndTarget();
     }
 
     public int[,] CreateMaze()
@@ -180,15 +228,13 @@ public class MazeGenerator : MonoBehaviour
         targetsCollected++;
     }
 
-    public void RespawnAgentAndTarget()
+    private void PlaceAgentAndTarget()
     {
         if (agent != null && target != null && pathMazes.Count > 0)
         {
-            // Random agent spawn
             int randomAgentIndex = rnd.Next(0, pathMazes.Count);
             agent.localPosition = pathMazes[randomAgentIndex];
 
-            // Random target spawn — ensure it's not on the same tile as agent
             int randomTargetIndex;
             do
             {
@@ -197,5 +243,12 @@ public class MazeGenerator : MonoBehaviour
 
             target.localPosition = pathMazes[randomTargetIndex];
         }
+    }
+    public void RespawnAgentAndTarget()
+    {
+        if (regenerateEachEpisode)
+            GenerateMaze(); // GenerateMaze calls PlaceAgentAndTarget internally
+        else
+            PlaceAgentAndTarget(); // just move agent/target, keep same maze
     }
 }

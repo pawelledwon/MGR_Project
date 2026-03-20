@@ -18,6 +18,7 @@ public class MazeAgent : Agent
     public override void Initialize()
     {
         rb = GetComponent<Rigidbody>();
+        rb.maxAngularVelocity = 0;
     }
 
     public override void OnEpisodeBegin()
@@ -47,6 +48,7 @@ public class MazeAgent : Agent
         float rotate = actions.ContinuousActions[1];
 
         transform.Rotate(Vector3.up, rotate * rotationSpeed * Time.fixedDeltaTime);
+
         rb.linearVelocity = new Vector3(
             (transform.forward * moveForward * moveSpeed).x,
             0f,
@@ -61,7 +63,7 @@ public class MazeAgent : Agent
         {
             SetReward(10f);
             mazeGenerator.TargetReached();
-            EndEpisode();
+            EndEpisode();       
         }
     }
 

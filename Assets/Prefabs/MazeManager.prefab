@@ -115,7 +115,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 822f44d59bf24f94793ed2b1ad3bbc58, type: 3}
+  m_Model: {fileID: 0}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: MazeAgent
@@ -153,8 +153,8 @@ Rigidbody:
   m_GameObject: {fileID: 1235347046429157266}
   serializedVersion: 4
   m_Mass: 1
-  m_Drag: 0.5
-  m_AngularDrag: 0.05
+  m_Drag: 1
+  m_AngularDrag: 4
   m_CenterOfMass: {x: 0, y: 0, z: 0}
   m_InertiaTensor: {x: 1, y: 1, z: 1}
   m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
@@ -223,10 +223,10 @@ MonoBehaviour:
   m_DetectableTags:
   - Wall
   - Goal
-  m_RaysPerDirection: 10
-  m_MaxRayDegrees: 130
+  m_RaysPerDirection: 8
+  m_MaxRayDegrees: 80
   m_SphereCastRadius: 0.5
-  m_RayLength: 10
+  m_RayLength: 2
   m_RayLayerMask:
     serializedVersion: 2
     m_Bits: 4294967291
@@ -290,6 +290,7 @@ MonoBehaviour:
   agent: {fileID: 1207069144520842140}
   target: {fileID: 6378061487088886363}
   targetsCollected: 0
+  regenerateEachEpisode: 0
 --- !u!1 &3169459362475086280
 GameObject:
   m_ObjectHideFlags: 0
@@ -409,7 +410,6 @@ GameObject:
   - component: {fileID: 8279068400391212718}
   - component: {fileID: 3451490864926938945}
   - component: {fileID: 9115717610738820638}
-  - component: {fileID: 3630323730527914720}
   m_Layer: 0
   m_Name: Sphere
   m_TagString: Untagged
@@ -485,24 +485,3 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!135 &3630323730527914720
-SphereCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4971403650651539445}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Radius: 0.5
-  m_Center: {x: 0, y: 0, z: 0}
