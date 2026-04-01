@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using Unity.MLAgents;
 
 public class CTFGameController : MonoBehaviour
 {
@@ -23,16 +24,29 @@ public class CTFGameController : MonoBehaviour
     private int stepCount = 0;
     private bool episodePending = false;
 
+    // One group per team — MA-POCA uses these for centralised credit assignment
+    private SimpleMultiAgentGroup m_Team0Group;
+    private SimpleMultiAgentGroup m_Team1Group;
+
     // ── Lifecycle ──────────────────────────────────────────
 
     void Start()
     {
+        Time.timeScale = 5f;
+
         team0FlagSpawn = team0Flag.position;
         team1FlagSpawn = team1Flag.position;
+
+        m_Team0Group = new SimpleMultiAgentGroup();
+        m_Team1Group = new SimpleMultiAgentGroup();
+
+        // Register all agents into their groups once — they stay registered
+        foreach (var a in team0Agents) m_Team0Group.RegisterAgent(a);
+        foreach (var a in team1Agents) m_Team1Group.RegisterAgent(a);
+
         StartEpisode();
     }
 
-    // Timeout: end the episode if neither team captures within maxSteps
     void FixedUpdate()
     {
         if (episodePending)
@@ -44,7 +58,15 @@ public class CTFGameController : MonoBehaviour
 
         stepCount++;
         if (stepCount >= maxSteps)
+        {
+            //m_Team0Group.GroupEpisodeInterrupted(); //MA - POCA
+            //m_Team1Group.GroupEpisodeInterrupted();
+
+            foreach (var a in team0Agents) a.EpisodeInterrupted(); //PPO
+            foreach (var a in team1Agents) a.EpisodeInterrupted();
+
             episodePending = true;
+        }
     }
 
     public void RequestEpisodeReset()
@@ -52,34 +74,30 @@ public class CTFGameController : MonoBehaviour
         episodePending = true;
     }
 
-    public void StartEpisode()
+    private void StartEpisode()
     {
         stepCount = 0;
-
         ResetAllFlags();
 
-        foreach (var a in team0Agents) { a.ResetAgent(); a.EndEpisode(); }
-        foreach (var a in team1Agents) { a.ResetAgent(); a.EndEpisode(); }
+        foreach (var a in team0Agents) a.ResetAgent();
+        foreach (var a in team1Agents) a.ResetAgent();
     }
 
+    // ── Flag logic ─────────────────────────────────────────
 
     public void AgentTouchedFlag(CTFAgent agent, int flagTeamID)
     {
-        // Agent touches the enemy flag -> pick it up
         if (agent.teamID != flagTeamID && !agent.hasEnemyFlag)
         {
             Transform flag = flagTeamID == 0 ? team0Flag : team1Flag;
 
             flag.SetParent(agent.transform);
-            flag.localPosition = new Vector3(0f, 2f, 0f);  // adjust Y to sit above your agent
+            flag.localPosition = new Vector3(0f, 2f, 0f);
             flag.localRotation = Quaternion.identity;
-
             flag.GetComponent<FlagTrigger>().IsCarried = true;
 
-            if (flagTeamID == 0)
-                team0FlagCarrier = agent;
-            else
-                team1FlagCarrier = agent;
+            if (flagTeamID == 0) team0FlagCarrier = agent;
+            else team1FlagCarrier = agent;
 
             agent.OnFlagPickedUp();
         }
@@ -104,15 +122,39 @@ public class CTFGameController : MonoBehaviour
 
     public void ScoreCapture(CTFAgent agent)
     {
-        if (!agent.hasEnemyFlag)
-        {
-            return;
-        }
+        if (!agent.hasEnemyFlag) return;
 
+        // Individual bonus for the carrier
         agent.OnFlagCaptured();
 
-        foreach (var e in GetEnemies(agent))
-            e.OnEnemyCapturedOurFlag();
+        /*MA - POCA*/
+
+        SimpleMultiAgentGroup winningGroup = agent.teamID == 0 ? m_Team0Group : m_Team1Group;
+        SimpleMultiAgentGroup losingGroup = agent.teamID == 0 ? m_Team1Group : m_Team0Group;
+
+        float timeBonus = 1f - (float)stepCount / (float)maxSteps;
+
+        winningGroup.AddGroupReward(2f + timeBonus);  // +2 for win + up to +1 for speed
+        losingGroup.AddGroupReward(-1f);               // -1 for losing
+
+        // EndGroupEpisode tells MA-POCA this was a natural completion —
+        // different from GroupEpisodeInterrupted which signals a timeout
+        winningGroup.EndGroupEpisode();
+        losingGroup.EndGroupEpisode();
+
+        /*PPO*/
+
+        //List<CTFAgent> winners = agent.teamID == 0 ? team0Agents : team1Agents;
+        //List<CTFAgent> losers = agent.teamID == 0 ? team1Agents : team0Agents;
+
+        //float timeBonus = 1f - (float)stepCount / (float)maxSteps;
+
+        //// Same reward values as MA-POCA group rewards — critical for fair comparison
+        //foreach (var a in winners) a.AddReward(2f + timeBonus);
+        //foreach (var a in losers) a.AddReward(-1f);
+
+        //foreach (var a in team0Agents) a.EndEpisode();
+        //foreach (var a in team1Agents) a.EndEpisode();
 
         RequestEpisodeReset();
     }
@@ -134,6 +176,9 @@ public class CTFGameController : MonoBehaviour
             team1Flag.GetComponent<FlagTrigger>().DropCooldown();
         }
     }
+
+    // ── Helpers ────────────────────────────────────────────
+
     public Vector3 GetEnemyFlagPosition(int teamID)
     {
         if (teamID == 0)

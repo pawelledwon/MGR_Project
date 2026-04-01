@@ -43,6 +43,9 @@ public class CTFAgent : Agent
 
     private const float POS_NORM = 8f;
 
+    private float m_PrevDistToFlag = 0f;
+    private float m_PrevDistToHome = 0f;
+
     private static readonly RigidbodyConstraints defaultConstraints = RigidbodyConstraints.FreezePositionY
                                | RigidbodyConstraints.FreezeRotationX
                                | RigidbodyConstraints.FreezeRotationZ;
@@ -65,9 +68,10 @@ public class CTFAgent : Agent
 
         agentRigidbody.linearVelocity = Vector3.zero;
         agentRigidbody.angularVelocity = Vector3.zero;
-
         agentRigidbody.constraints = defaultConstraints;
 
+        m_PrevDistToFlag = 0f;
+        m_PrevDistToHome = 0f;
         dashTimer = 0f;
         shootTimer = 0f;
         hasEnemyFlag = false;
@@ -106,31 +110,43 @@ public class CTFAgent : Agent
             if (!e.gameObject.activeInHierarchy) continue;
             enemyBuffer.AppendObservation(AgentObs(e));
         }
+    }
 
+    private void ApplyShapingRewards()
+    {
+        Vector3 flagPos = gameController.GetEnemyFlagPosition(teamID);
         if (!hasEnemyFlag)
         {
-            float distToFlag = Vector3.Distance(transform.position, flagPos);
-            AddReward(-distToFlag * 0.0001f);
+            float dist = Vector3.Distance(transform.position, flagPos);
+            if (m_PrevDistToFlag > 0f)
+                AddReward((m_PrevDistToFlag - dist) * 0.005f);
+            m_PrevDistToFlag = dist;
+            m_PrevDistToHome = 0f;
         }
         else
         {
-            float distToHome = Vector3.Distance(transform.position, homeBase.position);
-            AddReward(-distToHome * 0.0001f);
+            float dist = Vector3.Distance(transform.position, homeBase.position);
+            if (m_PrevDistToHome > 0f)
+                AddReward((m_PrevDistToHome - dist) * 0.01f);
+            m_PrevDistToHome = dist;
+            m_PrevDistToFlag = 0f;
+            AddReward(0.0002f); 
         }
+
+        foreach (var t in gameController.GetTeammates(this))
+            if (t.hasEnemyFlag) AddReward(0.0002f);
     }
 
-    // 5 floats — must match "Observation Size" on both BufferSensorComponents in the Inspector
     private float[] AgentObs(CTFAgent other)
     {
         Vector3 relPos = transform.InverseTransformPoint(other.transform.position) / POS_NORM;
-
         float relVelFwd = Vector3.Dot(other.agentRigidbody.linearVelocity, transform.forward) / 20f;
         float relVelRight = Vector3.Dot(other.agentRigidbody.linearVelocity, transform.right) / 20f;
 
         return new float[]
         {
             relPos.x,
-            relPos.z,                       // z not y — ground-plane position
+            relPos.z,                       
             relVelFwd,
             relVelRight,
             other.hasEnemyFlag ? 1f : 0f,
@@ -163,8 +179,11 @@ public class CTFAgent : Agent
             shootTimer = shootCooldown;
         }
 
-        AddReward(-0.0005f);
+        ApplyShapingRewards();
+
+        AddReward(-0.0001f);
     }
+
 
     public override void Heuristic(in ActionBuffers actionsOut)
     {
@@ -178,21 +197,15 @@ public class CTFAgent : Agent
         d[1] = Input.GetKey(KeyCode.F) ? 1 : 0;
     }
 
+
     private void Shoot()
     {
         if (projectilePrefab == null || shootPoint == null) return;
 
-        // Spawn at shootPoint — position and rotation follow the agent automatically
-        // since shootPoint is a child transform
         GameObject proj = Instantiate(projectilePrefab, shootPoint.position, shootPoint.rotation);
 
-        // Set ownership so the projectile knows who fired it
         CTFProjectile p = proj.GetComponent<CTFProjectile>();
-        if (p != null)
-        {
-            p.owner = this;
-            p.teamID = teamID;
-        }
+        if (p != null) { p.owner = this; p.teamID = teamID; }
 
         Rigidbody rb = proj.GetComponent<Rigidbody>();
         if (rb != null)
@@ -200,22 +213,26 @@ public class CTFAgent : Agent
             Vector3 shootDir = shootPoint.forward;
             shootDir.y = 0f;
             shootDir.Normalize();
-
-            rb.useGravity = false;  // fly straight, no arc
+            rb.useGravity = false;
             rb.AddForce(shootDir * projectileForce, ForceMode.Impulse);
         }
 
-        Destroy(proj, 4f);  // safety cleanup if it somehow misses everything
+        Destroy(proj, 4f);
     }
+
+    // ── Hit & stun ─────────────────────────────────────────
 
     public void OnHitByProjectile(CTFAgent shooter)
     {
         if (isStunned) return;
 
-        shooter.AddReward(0.1f);
+        // Small individual reward for the shooter — mirrors DodgeBall +0.02
+        // Keep it small so shooting is a tool, not the goal
+        shooter.AddReward(0.02f);
 
         if (hasEnemyFlag)
         {
+            shooter.AddReward(0.15f);
             gameController.DropFlag(this);
             hasEnemyFlag = false;
         }
@@ -232,40 +249,25 @@ public class CTFAgent : Agent
 
         yield return new WaitForSeconds(0.15f);
 
-
         agentRigidbody.linearVelocity = Vector3.zero;
         agentRigidbody.angularVelocity = Vector3.zero;
         agentRigidbody.constraints = RigidbodyConstraints.FreezeAll;
 
         yield return new WaitForSeconds(stunDuration);
+
         agentRigidbody.constraints = defaultConstraints;
-
-
         isStunned = false;
     }
-
     public void OnFlagPickedUp()
     {
         hasEnemyFlag = true;
-        AddReward(0.5f);
+        AddReward(0.1f);   // small — group reward on capture is what matters
     }
-
     public void OnFlagCaptured()
     {
         hasEnemyFlag = false;
-        AddReward(1.0f);
-
-        
-        foreach (var t in gameController.GetTeammates(this))
-            t.AddReward(0.5f);
+        AddReward(1.0f);   // individual carrier bonus on top of group reward
     }
-
-    public void OnEnemyCapturedOurFlag()
-    {
-        AddReward(-1.0f);
-    }
-
-    // ── Helpers ────────────────────────────────────────────
 
     private Vector2 LocalVelocity()
     {

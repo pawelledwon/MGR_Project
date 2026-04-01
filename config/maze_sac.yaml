@@ -2,16 +2,16 @@ behaviors:
   MazeAgent:
     trainer_type: sac
     hyperparameters:
-      learning_rate: 1.0e-4
-      batch_size: 512           # larger batch = fewer updates = faster
+      learning_rate: 3.0e-4 
+      batch_size: 512
       buffer_size: 100000
       init_entcoef: 0.01
       tau: 0.005
-      steps_per_update: 20      # key change
+      steps_per_update: 20
       save_replay_buffer: true
     network_settings:
       normalize: true
-      hidden_units: 128         # reduce from 256 — maze doesn't need huge network
+      hidden_units: 128
       num_layers: 2
     reward_signals:
       extrinsic:

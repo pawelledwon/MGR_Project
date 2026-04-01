@@ -106,7 +106,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_BrainParameters:
-    VectorObservationSize: 6
+    VectorObservationSize: 3
     NumStackedVectorObservations: 1
     m_ActionSpec:
       m_NumContinuousActions: 2
@@ -115,7 +115,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: 822f44d59bf24f94793ed2b1ad3bbc58, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: MazeAgent
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3a5c9d521e5ef4759a8246a07d52221e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  DecisionPeriod: 5
+  DecisionPeriod: 10
   DecisionStep: 0
   TakeActionsBetweenDecisions: 1
 --- !u!65 &5525029685213583787
@@ -223,10 +223,10 @@ MonoBehaviour:
   m_DetectableTags:
   - Wall
   - Goal
-  m_RaysPerDirection: 8
-  m_MaxRayDegrees: 80
+  m_RaysPerDirection: 12
+  m_MaxRayDegrees: 180
   m_SphereCastRadius: 0.5
-  m_RayLength: 2
+  m_RayLength: 15
   m_RayLayerMask:
     serializedVersion: 2
     m_Bits: 4294967291
@@ -289,8 +289,10 @@ MonoBehaviour:
   height: 7
   agent: {fileID: 1207069144520842140}
   target: {fileID: 6378061487088886363}
+  usePillarGrid: 0
   targetsCollected: 0
-  regenerateEachEpisode: 0
+  extraWallChance: 0.3
+  regenerateEachEpisode: 1
 --- !u!1 &3169459362475086280
 GameObject:
   m_ObjectHideFlags: 0

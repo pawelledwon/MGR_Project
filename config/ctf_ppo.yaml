@@ -1,6 +1,6 @@
 behaviors:
   CTFAgent:                         # must match Behavior Name in Unity Inspector
-    trainer_type: poca              # MA-POCA — centralised critic, shared team reward
+    trainer_type: ppo              # MA-POCA — centralised critic, shared team reward
     max_steps: 10000000           # total env steps across all agents combined
     time_horizon: 128               # steps collected per agent before updating
     summary_freq: 10000            # how often stats are written to TensorBoard

@@ -36,8 +36,8 @@ public class MazeAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        Vector3 toTarget = target.position - transform.position;
-        sensor.AddObservation(transform.InverseTransformDirection(toTarget));
+       // Vector3 toTarget = target.position - transform.position;
+        //sensor.AddObservation(transform.InverseTransformDirection(toTarget));
 
         sensor.AddObservation(transform.InverseTransformDirection(rb.linearVelocity));
     }
@@ -69,8 +69,8 @@ public class MazeAgent : Agent
 
     private void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Wall"))
-            AddReward(-0.01f);
+        //if (collision.gameObject.CompareTag("Wall"))
+        //    AddReward(-0.01f);
     }
 
     public override void Heuristic(in ActionBuffers actionsOut)
