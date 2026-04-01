@@ -15,7 +15,8 @@ public class CTFGameController : MonoBehaviour
     [Header("Episode")]
     public int maxSteps = 5000;   // episode timeout; tune to your arena size
 
-    // Internal flag state
+    private CTFMetricsLogger metricsLogger;
+
     private Vector3 team0FlagSpawn;
     private Vector3 team1FlagSpawn;
     private CTFAgent team0FlagCarrier = null;  // team1 agent carrying team0's flag
@@ -24,15 +25,15 @@ public class CTFGameController : MonoBehaviour
     private int stepCount = 0;
     private bool episodePending = false;
 
-    // One group per team — MA-POCA uses these for centralised credit assignment
     private SimpleMultiAgentGroup m_Team0Group;
     private SimpleMultiAgentGroup m_Team1Group;
 
-    // ── Lifecycle ──────────────────────────────────────────
 
     void Start()
     {
-        Time.timeScale = 5f;
+        metricsLogger = GetComponent<CTFMetricsLogger>();
+
+        Time.timeScale = 20f;
 
         team0FlagSpawn = team0Flag.position;
         team1FlagSpawn = team1Flag.position;
@@ -40,7 +41,6 @@ public class CTFGameController : MonoBehaviour
         m_Team0Group = new SimpleMultiAgentGroup();
         m_Team1Group = new SimpleMultiAgentGroup();
 
-        // Register all agents into their groups once — they stay registered
         foreach (var a in team0Agents) m_Team0Group.RegisterAgent(a);
         foreach (var a in team1Agents) m_Team1Group.RegisterAgent(a);
 
@@ -55,6 +55,8 @@ public class CTFGameController : MonoBehaviour
             StartEpisode();
             return;
         }
+
+        metricsLogger.RecordFrame(team0Agents, team1Agents);
 
         stepCount++;
         if (stepCount >= maxSteps)
@@ -76,14 +78,14 @@ public class CTFGameController : MonoBehaviour
 
     private void StartEpisode()
     {
+        metricsLogger.RecordEpisodeEnd();
+
         stepCount = 0;
         ResetAllFlags();
 
         foreach (var a in team0Agents) a.ResetAgent();
         foreach (var a in team1Agents) a.ResetAgent();
     }
-
-    // ── Flag logic ─────────────────────────────────────────
 
     public void AgentTouchedFlag(CTFAgent agent, int flagTeamID)
     {
@@ -129,32 +131,35 @@ public class CTFGameController : MonoBehaviour
 
         /*MA - POCA*/
 
-        SimpleMultiAgentGroup winningGroup = agent.teamID == 0 ? m_Team0Group : m_Team1Group;
-        SimpleMultiAgentGroup losingGroup = agent.teamID == 0 ? m_Team1Group : m_Team0Group;
-
-        float timeBonus = 1f - (float)stepCount / (float)maxSteps;
-
-        winningGroup.AddGroupReward(2f + timeBonus);  // +2 for win + up to +1 for speed
-        losingGroup.AddGroupReward(-1f);               // -1 for losing
-
-        // EndGroupEpisode tells MA-POCA this was a natural completion —
-        // different from GroupEpisodeInterrupted which signals a timeout
-        winningGroup.EndGroupEpisode();
-        losingGroup.EndGroupEpisode();
-
-        /*PPO*/
-
-        //List<CTFAgent> winners = agent.teamID == 0 ? team0Agents : team1Agents;
-        //List<CTFAgent> losers = agent.teamID == 0 ? team1Agents : team0Agents;
+        //SimpleMultiAgentGroup winningGroup = agent.teamID == 0 ? m_Team0Group : m_Team1Group;
+        //SimpleMultiAgentGroup losingGroup = agent.teamID == 0 ? m_Team1Group : m_Team0Group;
 
         //float timeBonus = 1f - (float)stepCount / (float)maxSteps;
 
-        //// Same reward values as MA-POCA group rewards — critical for fair comparison
-        //foreach (var a in winners) a.AddReward(2f + timeBonus);
-        //foreach (var a in losers) a.AddReward(-1f);
+        //winningGroup.AddGroupReward(2f + timeBonus);  // +2 for win + up to +1 for speed
+        //losingGroup.AddGroupReward(-1f);               // -1 for losing
 
-        //foreach (var a in team0Agents) a.EndEpisode();
-        //foreach (var a in team1Agents) a.EndEpisode();
+        //// EndGroupEpisode tells MA-POCA this was a natural completion —
+        //// different from GroupEpisodeInterrupted which signals a timeout
+        //winningGroup.EndGroupEpisode();
+        //losingGroup.EndGroupEpisode();
+
+        /*PPO*/
+
+        List<CTFAgent> winners = agent.teamID == 0 ? team0Agents : team1Agents;
+        List<CTFAgent> losers = agent.teamID == 0 ? team1Agents : team0Agents;
+
+        float timeBonus = 1f - (float)stepCount / (float)maxSteps;
+
+        // Same reward values as MA-POCA group rewards — critical for fair comparison
+        foreach (var a in winners) a.AddReward(2f + timeBonus);
+        foreach (var a in losers) a.AddReward(-1f);
+
+        foreach (var a in team0Agents) a.EndEpisode();
+        foreach (var a in team1Agents) a.EndEpisode();
+
+        /**/
+        metricsLogger.RecordCapture();
 
         RequestEpisodeReset();
     }
@@ -176,8 +181,6 @@ public class CTFGameController : MonoBehaviour
             team1Flag.GetComponent<FlagTrigger>().DropCooldown();
         }
     }
-
-    // ── Helpers ────────────────────────────────────────────
 
     public Vector3 GetEnemyFlagPosition(int teamID)
     {

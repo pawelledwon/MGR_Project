@@ -277,7 +277,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 3a8df10434132524f89061377336d3b2, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: CTFAgent
   TeamId: 0
   m_UseChildSensors: 1
@@ -556,7 +556,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 3a8df10434132524f89061377336d3b2, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: CTFAgent
   TeamId: 0
   m_UseChildSensors: 1
@@ -1202,7 +1202,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 3a8df10434132524f89061377336d3b2, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: CTFAgent
   TeamId: 0
   m_UseChildSensors: 1
@@ -2303,7 +2303,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 3a8df10434132524f89061377336d3b2, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: CTFAgent
   TeamId: 0
   m_UseChildSensors: 1
@@ -2582,7 +2582,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 3a8df10434132524f89061377336d3b2, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: CTFAgent
   TeamId: 0
   m_UseChildSensors: 1
@@ -2920,6 +2920,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3768033325942283149}
   - component: {fileID: 520708381073304665}
+  - component: {fileID: 2353745597949692208}
   m_Layer: 0
   m_Name: GameController
   m_TagString: Untagged
@@ -2969,6 +2970,21 @@ MonoBehaviour:
   team0Flag: {fileID: 5052097171667622050}
   team1Flag: {fileID: 3431984586692060578}
   maxSteps: 5000
+--- !u!114 &2353745597949692208
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5200289287740980086}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 934f9a188e05a5a409fbccce4b54d4d5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  algorithmName: MAPOCA
+  escortDistanceThreshold: 3
+  arenaHalfwayZ: 7.5
 --- !u!1 &5321761236445267335
 GameObject:
   m_ObjectHideFlags: 0
@@ -4015,7 +4031,7 @@ MonoBehaviour:
     hasUpgradedBrainParametersWithActionSpec: 1
   m_Model: {fileID: 5022602860645237092, guid: 3a8df10434132524f89061377336d3b2, type: 3}
   m_InferenceDevice: 0
-  m_BehaviorType: 0
+  m_BehaviorType: 2
   m_BehaviorName: CTFAgent
   TeamId: 0
   m_UseChildSensors: 1

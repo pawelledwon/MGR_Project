@@ -173,7 +173,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1402918316179793603, guid: 35db553db6c35ef48a015b337a649a1f, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -234,7 +234,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1402918316179793603, guid: 35db553db6c35ef48a015b337a649a1f, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -295,7 +295,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1402918316179793603, guid: 35db553db6c35ef48a015b337a649a1f, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -611,6 +611,10 @@ PrefabInstance:
     - target: {fileID: 1402918316179793603, guid: 35db553db6c35ef48a015b337a649a1f, type: 3}
       propertyPath: m_Name
       value: CTFarena
+      objectReference: {fileID: 0}
+    - target: {fileID: 2353745597949692208, guid: 35db553db6c35ef48a015b337a649a1f, type: 3}
+      propertyPath: algorithmName
+      value: PPO_2000
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
