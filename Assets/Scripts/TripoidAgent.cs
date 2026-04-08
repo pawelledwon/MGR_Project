@@ -5,6 +5,9 @@ using Unity.MLAgents.Sensors;
 
 public class TripodAgent : Agent
 {
+    [Header("Metryki (Opcjonalne)")]
+    public TripoidAgentMetrics metrics;
+
     [Header("Fizyka Robota")]
     public Rigidbody bodyRigidbody;
     public HingeJoint[] swingJoints = new HingeJoint[3]; 
@@ -57,6 +60,8 @@ public class TripodAgent : Agent
 
     public override void OnEpisodeBegin()
     {
+        if (metrics != null) metrics.OnEpisodeStart();
+
         if (targetInstance != null)
         {
             Destroy(targetInstance);
@@ -219,6 +224,8 @@ public class TripodAgent : Agent
                 EndEpisode();
             }
         }
+
+        if (metrics != null) metrics.RecordJitter(actions);
     }
 
     private void ApplyLegAction(HingeJoint joint, float actionValue)

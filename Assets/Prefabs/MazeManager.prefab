@@ -115,7 +115,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 822f44d59bf24f94793ed2b1ad3bbc58, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 489a8333199007b4fbd6554b630481a0, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: MazeAgent
@@ -285,11 +285,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   brick: {fileID: 2100000, guid: 6c68ef17617af3a4d99bfae328cbaecd, type: 2}
   floorMaterial: {fileID: 2100000, guid: eb8114012c7a66f478bb27856ecbff98, type: 2}
-  width: 7
-  height: 7
+  width: 13
+  height: 13
   agent: {fileID: 1207069144520842140}
   target: {fileID: 6378061487088886363}
-  usePillarGrid: 0
+  usePillarGrid: 1
   targetsCollected: 0
   extraWallChance: 0.3
   regenerateEachEpisode: 1

@@ -1019,6 +1019,7 @@ GameObject:
   - component: {fileID: 2862379541703614562}
   - component: {fileID: 1880323993982182378}
   - component: {fileID: 2710239657906259389}
+  - component: {fileID: 7923225862211250622}
   m_Layer: 0
   m_Name: Body
   m_TagString: Untagged
@@ -1164,7 +1165,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: abc899fcfba378643a838f4e70cbfc2c, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 435a3e830842e744fa6911ad5724bc8e, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: TripoidAgent
@@ -1189,6 +1190,7 @@ MonoBehaviour:
     maxStep: 0
   hasUpgradedFromAgentParameters: 1
   MaxStep: 2000
+  metrics: {fileID: 7923225862211250622}
   bodyRigidbody: {fileID: 8372091652099603030}
   swingJoints:
   - {fileID: 4957704167022703145}
@@ -1216,6 +1218,20 @@ MonoBehaviour:
   DecisionPeriod: 5
   DecisionStep: 0
   TakeActionsBetweenDecisions: 1
+--- !u!114 &7923225862211250622
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6510502338530912768}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fad42a3fc39b3d941b84e7ac3b949759, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 1880323993982182378}
+  algorithmName: SAC
 --- !u!1 &7149001866886891421
 GameObject:
   m_ObjectHideFlags: 0

@@ -33,7 +33,7 @@ public class CTFGameController : MonoBehaviour
     {
         metricsLogger = GetComponent<CTFMetricsLogger>();
 
-        Time.timeScale = 20f;
+        Time.timeScale = 5f;
 
         team0FlagSpawn = team0Flag.position;
         team1FlagSpawn = team1Flag.position;

@@ -1,26 +1,26 @@
 behaviors:
-  CTFAgent:                         # must match Behavior Name in Unity Inspector
-    trainer_type: ppo              # MA-POCA — centralised critic, shared team reward
-    max_steps: 10000000           # total env steps across all agents combined
-    time_horizon: 128               # steps collected per agent before updating
-    summary_freq: 10000            # how often stats are written to TensorBoard
-    keep_checkpoints: 5             # number of model checkpoints to keep
+  CTFAgent:                         
+    trainer_type: ppo              
+    max_steps: 10000000           
+    time_horizon: 128               
+    summary_freq: 10000            
+    keep_checkpoints: 5             
     hyperparameters:
       batch_size: 2048              
       buffer_size: 204800            
       learning_rate: 3.0e-4
-      learning_rate_schedule: linear  # decays to 0 over max_steps
-      beta: 0.01                  # entropy coefficient — keeps exploration alive
-      epsilon: 0.2                  # PPO clip range
-      lambd: 0.95                   # GAE lambda — balance bias vs variance
-      num_epoch: 3                  # passes over the buffer per update
+      learning_rate_schedule: linear  
+      beta: 0.01                  
+      epsilon: 0.2                  
+      lambd: 0.95                   
+      num_epoch: 3                  
     network_settings:
-      normalize: true               # normalises observations — important for mixed
-      hidden_units: 256             # neurons per layer
-      num_layers: 3                 # deeper = more capacity, slower to train
+      normalize: true               
+      hidden_units: 256             
+      num_layers: 3                 
       vis_encode_type: simple
 
     reward_signals:
       extrinsic:
-        gamma: 0.99                 # discount — high because captures are rare
+        gamma: 0.99                 
         strength: 1.0
