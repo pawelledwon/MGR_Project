@@ -1,0 +1,65 @@
+{
+    "TripoidAgent": {
+        "checkpoints": [
+            {
+                "steps": 2499975,
+                "file_path": "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-2499975.onnx",
+                "reward": 7.173962875998919,
+                "creation_time": 1777155863.9646304,
+                "auxillary_file_paths": [
+                    "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-2499975.pt"
+                ]
+            },
+            {
+                "steps": 2999891,
+                "file_path": "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-2999891.onnx",
+                "reward": 10.84253185010033,
+                "creation_time": 1777156420.7304783,
+                "auxillary_file_paths": [
+                    "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-2999891.pt"
+                ]
+            },
+            {
+                "steps": 3499958,
+                "file_path": "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-3499958.onnx",
+                "reward": 12.869587284726137,
+                "creation_time": 1777156949.6810365,
+                "auxillary_file_paths": [
+                    "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-3499958.pt"
+                ]
+            },
+            {
+                "steps": 3999953,
+                "file_path": "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-3999953.onnx",
+                "reward": 12.128949368872293,
+                "creation_time": 1777157480.058138,
+                "auxillary_file_paths": [
+                    "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-3999953.pt"
+                ]
+            },
+            {
+                "steps": 4000192,
+                "file_path": "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-4000192.onnx",
+                "reward": 12.397060252371288,
+                "creation_time": 1777157480.0834274,
+                "auxillary_file_paths": [
+                    "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-4000192.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 4000192,
+            "file_path": "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent.onnx",
+            "reward": 12.397060252371288,
+            "creation_time": 1777157480.0834274,
+            "auxillary_file_paths": [
+                "results\\Tripoid_PPO_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-4000192.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cpu"
+    }
+}

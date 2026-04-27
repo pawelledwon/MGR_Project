@@ -1,0 +1,65 @@
+{
+    "CTFAgent": {
+        "checkpoints": [
+            {
+                "steps": 8499984,
+                "file_path": "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-8499984.onnx",
+                "reward": 0.2837964811338323,
+                "creation_time": 1774634634.2459548,
+                "auxillary_file_paths": [
+                    "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-8499984.pt"
+                ]
+            },
+            {
+                "steps": 8999986,
+                "file_path": "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-8999986.onnx",
+                "reward": 0.2854340863072551,
+                "creation_time": 1774635595.6757305,
+                "auxillary_file_paths": [
+                    "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-8999986.pt"
+                ]
+            },
+            {
+                "steps": 9499962,
+                "file_path": "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-9499962.onnx",
+                "reward": 0.2905655344892837,
+                "creation_time": 1774636785.1121113,
+                "auxillary_file_paths": [
+                    "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-9499962.pt"
+                ]
+            },
+            {
+                "steps": 9999984,
+                "file_path": "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-9999984.onnx",
+                "reward": 0.2799415085664662,
+                "creation_time": 1774637753.362469,
+                "auxillary_file_paths": [
+                    "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-9999984.pt"
+                ]
+            },
+            {
+                "steps": 10000752,
+                "file_path": "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-10000752.onnx",
+                "reward": 0.2799415085664662,
+                "creation_time": 1774637753.6358454,
+                "auxillary_file_paths": [
+                    "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-10000752.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 10000752,
+            "file_path": "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent.onnx",
+            "reward": 0.2799415085664662,
+            "creation_time": 1774637753.6358454,
+            "auxillary_file_paths": [
+                "results\\MAPOCA_Ctf_10th_GroupReward_New_setttings\\CTFAgent\\CTFAgent-10000752.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cpu"
+    }
+}

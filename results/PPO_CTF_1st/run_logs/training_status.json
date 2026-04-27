@@ -1,0 +1,65 @@
+{
+    "CTFAgent": {
+        "checkpoints": [
+            {
+                "steps": 8499968,
+                "file_path": "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-8499968.onnx",
+                "reward": 1.2229876492085168,
+                "creation_time": 1774699084.2256396,
+                "auxillary_file_paths": [
+                    "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-8499968.pt"
+                ]
+            },
+            {
+                "steps": 8999940,
+                "file_path": "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-8999940.onnx",
+                "reward": 1.2248491006536857,
+                "creation_time": 1774699716.459284,
+                "auxillary_file_paths": [
+                    "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-8999940.pt"
+                ]
+            },
+            {
+                "steps": 9499968,
+                "file_path": "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-9499968.onnx",
+                "reward": 1.232896200577338,
+                "creation_time": 1774700454.0836368,
+                "auxillary_file_paths": [
+                    "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-9499968.pt"
+                ]
+            },
+            {
+                "steps": 9999938,
+                "file_path": "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-9999938.onnx",
+                "reward": 1.2278519689900245,
+                "creation_time": 1774701096.7632015,
+                "auxillary_file_paths": [
+                    "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-9999938.pt"
+                ]
+            },
+            {
+                "steps": 10000578,
+                "file_path": "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-10000578.onnx",
+                "reward": 1.2278519689900245,
+                "creation_time": 1774701097.0006113,
+                "auxillary_file_paths": [
+                    "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-10000578.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 10000578,
+            "file_path": "results\\PPO_CTF_1st\\CTFAgent.onnx",
+            "reward": 1.2278519689900245,
+            "creation_time": 1774701097.0006113,
+            "auxillary_file_paths": [
+                "results\\PPO_CTF_1st\\CTFAgent\\CTFAgent-10000578.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cpu"
+    }
+}

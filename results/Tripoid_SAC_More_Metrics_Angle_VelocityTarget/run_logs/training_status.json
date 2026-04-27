@@ -1,0 +1,47 @@
+{
+    "TripoidAgent": {
+        "checkpoints": [
+            {
+                "steps": 499994,
+                "file_path": "results\\Tripoid_SAC_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-499994.onnx",
+                "reward": null,
+                "creation_time": 1777211222.3871465,
+                "auxillary_file_paths": [
+                    "results\\Tripoid_SAC_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-499994.pt"
+                ]
+            },
+            {
+                "steps": 999978,
+                "file_path": "results\\Tripoid_SAC_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-999978.onnx",
+                "reward": null,
+                "creation_time": 1777216231.8987784,
+                "auxillary_file_paths": [
+                    "results\\Tripoid_SAC_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-999978.pt"
+                ]
+            },
+            {
+                "steps": 1000037,
+                "file_path": "results\\Tripoid_SAC_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-1000037.onnx",
+                "reward": 21.045867919921875,
+                "creation_time": 1777216231.937375,
+                "auxillary_file_paths": [
+                    "results\\Tripoid_SAC_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-1000037.pt"
+                ]
+            }
+        ],
+        "final_checkpoint": {
+            "steps": 1000037,
+            "file_path": "results\\Tripoid_SAC_More_Metrics_Angle_VelocityTarget\\TripoidAgent.onnx",
+            "reward": 21.045867919921875,
+            "creation_time": 1777216231.937375,
+            "auxillary_file_paths": [
+                "results\\Tripoid_SAC_More_Metrics_Angle_VelocityTarget\\TripoidAgent\\TripoidAgent-1000037.pt"
+            ]
+        }
+    },
+    "metadata": {
+        "stats_format_version": "0.3.0",
+        "mlagents_version": "1.1.0",
+        "torch_version": "2.2.2+cpu"
+    }
+}
