@@ -6,8 +6,8 @@ import os
 
 # --- KONFIGURACJA ---
 # Wpisz nazwy swoich wygenerowanych plików
-sac_file = "Tripoid_Jitter_SAC.csv" 
-ppo_file = "Tripoid_Jitter_PPO.csv"
+sac_file = "Tripoid_Metrics_SAC_20260427_153808.csv" 
+ppo_file = "Tripoid_Metrics_PPO_20260427_154602.csv"
 OUTPUT_DIR = "tripod_results"
 
 SAC_COLOR = "#2ecc71" # Zielony (SAC często kojarzony z "soft")
@@ -46,13 +46,14 @@ print("\n=== SUMMARY STATISTICS ===")
 print(summary_df.to_string(index=False))
 
 # --- 2. WYKRESY (Styl identyczny z Twoim przykładem MA-POCA) ---
-fig, axes = plt.subplots(2, 1, figsize=(12, 10))
-fig.suptitle("Analiza Płynności Ruchu: SAC vs PPO\n(Rolling mean 20 episodes)", 
+fig, axes = plt.subplots(3, 1, figsize=(12, 14)) # Zwiększono wysokość figsize
+fig.suptitle("Analiza Metryk Chodu: SAC vs PPO\n(Rolling mean 20 episodes)", 
              fontsize=14, fontweight="bold")
 
 plot_metrics = [
     ("MeanActionJitter", "Szum Akcji (Decyzje Sieci)"),
-    ("MeanMechJitter", "Szum Mechaniczny (Szarpanie Stawów)")
+    ("MeanMechJitter", "Szum Mechaniczny (Szarpanie Stawów)"),
+    ("MeanLinearSpeed", "Średnia Prędkość Liniowa (Szybkość Chodu)") # Nowy wykres
 ]
 
 for ax, (metric, title) in zip(axes, plot_metrics):
@@ -69,11 +70,9 @@ for ax, (metric, title) in zip(axes, plot_metrics):
     ax.plot(ppo["Episode"], ppo[metric], color=PPO_COLOR, alpha=0.08, linewidth=0.5, zorder=2)
 
     # --- DOPASOWANIE OSI ---
-    # Oś X: od pierwszego do ostatniego epizodu (usuwa puste boki)
     ax.set_xlim(sac["Episode"].min(), sac["Episode"].max())
 
-    # Oś Y: dynamiczny zakres na podstawie średniej kroczącej + 15% zapasu
-    # Wybieramy min i max z obu algorytmów, żeby skala była wspólna
+    # Dynamiczny zakres na podstawie średniej kroczącej + 15% zapasu
     combined_roll = pd.concat([sac_roll, ppo_roll]).dropna()
     y_min = combined_roll.min() * 0.85
     y_max = combined_roll.max() * 1.15
@@ -87,4 +86,5 @@ for ax, (metric, title) in zip(axes, plot_metrics):
     ax.grid(True, alpha=0.3, linestyle='--')
 
 plt.tight_layout(rect=[0, 0.03, 1, 0.95])
-plt.savefig(f"{OUTPUT_DIR}/smoothness_comparison_final.png", dpi=200)
+plt.savefig(f"{OUTPUT_DIR}/metrics_comparison_final.png", dpi=200)
+print(f"\n[Info] Zapisano wykresy w folderze: {OUTPUT_DIR}")

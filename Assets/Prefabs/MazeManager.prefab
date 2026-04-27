@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 7851553114291291340}
   - component: {fileID: 2626805325830560275}
   - component: {fileID: 1917269659414590115}
+  - component: {fileID: 8416409859033148093}
   - component: {fileID: 6499865096133303562}
   - component: {fileID: 4086329534576950736}
   - component: {fileID: 5525029685213583787}
@@ -115,7 +116,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 5022602860645237092, guid: 489a8333199007b4fbd6554b630481a0, type: 3}
+  m_Model: {fileID: 5022602860645237092, guid: 822f44d59bf24f94793ed2b1ad3bbc58, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: MazeAgent
@@ -142,8 +143,25 @@ MonoBehaviour:
   MaxStep: 5000
   mazeGenerator: {fileID: 8080169422199044635}
   target: {fileID: 6378061487088886363}
+  metrics: {fileID: 8416409859033148093}
   moveSpeed: 5
   rotationSpeed: 200
+--- !u!114 &8416409859033148093
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1235347046429157266}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a2bc35aaa323b9442a0b330e4cabcfb9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  agent: {fileID: 1917269659414590115}
+  generator: {fileID: 8080169422199044635}
+  algorithmName: PPO
+  maxEpisodes: 2000
 --- !u!54 &6499865096133303562
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -292,7 +310,7 @@ MonoBehaviour:
   usePillarGrid: 1
   targetsCollected: 0
   extraWallChance: 0.3
-  regenerateEachEpisode: 1
+  regenerateEachEpisode: 0
 --- !u!1 &3169459362475086280
 GameObject:
   m_ObjectHideFlags: 0

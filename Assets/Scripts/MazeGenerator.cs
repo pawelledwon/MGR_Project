@@ -19,20 +19,28 @@ public class MazeGenerator : MonoBehaviour
     [Header("Typ Środowiska")]
     public bool usePillarGrid = false;
 
+    [Tooltip("TRUE = Success Rate / Długość (Losowe mapy). FALSE = Heatmapa (Stała mapa).")]
+    public bool regenerateEachEpisode = true;
+
+    [Header("Ewaluacja / Seed")]
+    [Tooltip("Zaznacz, aby sekwencja losowań (mapy i pozycje) była identyczna w każdym teście PPO i SAC")]
+    public bool useFixedSeedSequence = true;
+    public int baseSeed = 42;
+    private int currentEpisodeIndex = 0; // Licznik używany do generowania seeda
+
     [Header("Statystyki (Curriculum Learning)")]
     public int targetsCollected = 0;
 
     [Header("Pillar Grid Settings")]
     [Range(0f, 0.8f)]
     public float extraWallChance = 0.3f;
-    public bool regenerateEachEpisode = true;
 
     private int[,] Grid;
     private List<Vector3> pathMazes = new List<Vector3>();
     private Stack<Vector2> _tiletoTry = new Stack<Vector2>();
     private List<Vector2> offsets = new List<Vector2> { new Vector2(0, 1), new Vector2(0, -1), new Vector2(1, 0), new Vector2(-1, 0) };
-    private System.Random rnd = new System.Random(42);
 
+    private System.Random rnd;
     private GameObject wallsContainer;
 
     private Vector2 _currentTile;
@@ -56,14 +64,38 @@ public class MazeGenerator : MonoBehaviour
 
     void Start()
     {
+        // Pierwsze wygenerowanie środowiska
+        UpdateRandomSeed();
         GenerateEnvironment();
+    }
+
+    public void RespawnAgentAndTarget()
+    {
+        currentEpisodeIndex++;
+        UpdateRandomSeed(); // Odświeżenie seeda dla nowego epizodu
+
+        if (regenerateEachEpisode)
+            GenerateEnvironment(); // Przebudowuje ściany i losuje pozycje agenta/celu
+        else
+            PlaceAgentAndTarget(); // Ściany zostają, losuje tylko pozycje agenta/celu
+    }
+
+    private void UpdateRandomSeed()
+    {
+        if (useFixedSeedSequence)
+        {
+            // Gwarantuje tę samą serię losowań dla każdego uruchomienia (PPO/SAC)
+            rnd = new System.Random(baseSeed + currentEpisodeIndex);
+        }
+        else
+        {
+            // Całkowita, niepowtarzalna losowość
+            rnd = new System.Random(Guid.NewGuid().GetHashCode());
+        }
     }
 
     public void GenerateEnvironment()
     {
-        if (regenerateEachEpisode)
-            rnd = new System.Random(Guid.NewGuid().GetHashCode());
-
         if (usePillarGrid)
             GeneratePillarGrid();
         else
@@ -142,7 +174,6 @@ public class MazeGenerator : MonoBehaviour
                     Grid[x, z] = 1;
 
         // scatter completely random single pillars
-        // no grid alignment, no clusters, just random positions
         int numPillars = (width * height) / 10; // ~10% coverage
 
         for (int i = 0; i < numPillars; i++)
@@ -188,7 +219,7 @@ public class MazeGenerator : MonoBehaviour
             for (int d = 0; d < 4; d++)
             {
                 int nx = (int)cell.x + dx[d];
-                int nz = (int)cell.y + dz[d]; // ← .y not .z
+                int nz = (int)cell.y + dz[d];
                 int nx2 = (int)cell.x + dx[d] * 2;
                 int nz2 = (int)cell.y + dz[d] * 2;
 
@@ -224,7 +255,7 @@ public class MazeGenerator : MonoBehaviour
             var current = queue.Dequeue();
             for (int d = 0; d < 4; d++)
             {
-                var next = new Vector2(current.x + dx[d], current.y + dz[d]); // ← .y not .z
+                var next = new Vector2(current.x + dx[d], current.y + dz[d]);
                 if (IsInsideInt((int)next.x, (int)next.y) &&
                     !visited.Contains(next) &&
                     Grid[(int)next.x, (int)next.y] == 0)
@@ -239,9 +270,11 @@ public class MazeGenerator : MonoBehaviour
 
     private bool IsInside(Vector2 p)
     {
-        // Przywrócono oryginalne granice z Twojego skryptu
         return p.x >= 0 && p.y >= 0 && p.x < width && p.y < height;
     }
+
+    private bool IsInsideInt(int x, int z) =>
+        x >= 0 && z >= 0 && x < width && z < height;
 
     public void TargetReached()
     {
@@ -306,14 +339,4 @@ public class MazeGenerator : MonoBehaviour
             target.localPosition = pathMazes[randomTargetIndex];
         }
     }
-    public void RespawnAgentAndTarget()
-    {
-        if (regenerateEachEpisode)
-            GenerateEnvironment(); // GenerateMaze calls PlaceAgentAndTarget internally
-        else
-            PlaceAgentAndTarget(); // just move agent/target, keep same maze
-    }
-
-    private bool IsInsideInt(int x, int z) =>
-        x >= 0 && z >= 0 && x < width && z < height;
 }

@@ -13,10 +13,16 @@ public class TripodAgent : Agent
     public HingeJoint[] swingJoints = new HingeJoint[3];
     public HingeJoint[] liftJoints = new HingeJoint[3];
 
+    [Header("Ewaluacja / Seed")]
+    [Tooltip("Zaznacz, aby zablokować losowość (przydatne do rzetelnego porównania PPO i SAC)")]
+    public bool useFixedSeed = true;
+    public int randomSeed = 42;
+
     [Header("Parametry Uczenia")]
     public float legMovementLimit = 60f;
 
     [Header("Cel")]
+    public float minTargetSpawnDistance = 3.0f;
     public float arenaSize = 10f;
     public GameObject targetPrefab;
     private GameObject targetInstance;
@@ -36,8 +42,6 @@ public class TripodAgent : Agent
     private Rigidbody[] swingRbs = new Rigidbody[3];
     private Rigidbody[] liftRbs = new Rigidbody[3];
 
-    private float speed = 0f;
-
     private float episodeAngleSum = 0f;      
     private int groundTouchSteps = 0;          
     private int episodeStepCount = 0;          
@@ -45,6 +49,12 @@ public class TripodAgent : Agent
 
     public override void Initialize()
     {
+        if (useFixedSeed)
+        {
+            Random.InitState(randomSeed);
+            Debug.Log($"[TripodAgent] Ustawiono sztywny seed losowości: {randomSeed}. Środowisko będzie deterministyczne.");
+        }
+
         startingPosition = transform.localPosition;
         startingRotation = transform.localRotation;
 
@@ -67,7 +77,11 @@ public class TripodAgent : Agent
 
     public override void OnEpisodeBegin()
     {
-        if (metrics != null) metrics.OnEpisodeStart();
+        if (metrics != null)
+        {
+            metrics.OnActionOverTimeEpisodeEnd();
+            metrics.OnEpisodeStart();
+        }
 
         // Zapisz metryki poprzedniego epizodu (przypadek MaxStep)
         if (episodeStepCount > 0)
@@ -146,12 +160,21 @@ public class TripodAgent : Agent
         }
 
         float halfArena = arenaSize / 2f;
+        Vector3 localSpawnPos;
+        int attempts = 0;
+        int maxAttempts = 30; // Bezpiecznik zapobiegający zawieszeniu pętli
 
-        Vector3 localSpawnPos = new Vector3(
-            Random.Range(-halfArena, halfArena),
-            startingPosition.y,
-            Random.Range(-halfArena, halfArena)
-        );
+        // Losuj pozycję dopóki nie będzie wystarczająco daleko od robota
+        do
+        {
+            localSpawnPos = new Vector3(
+                Random.Range(-halfArena, halfArena),
+                startingPosition.y,
+                Random.Range(-halfArena, halfArena)
+            );
+            attempts++;
+        }
+        while (Vector3.Distance(localSpawnPos, startingPosition) < minTargetSpawnDistance && attempts < maxAttempts);
 
         Vector3 worldSpawnPos = transform.parent != null
             ? transform.parent.TransformPoint(localSpawnPos)
@@ -164,16 +187,6 @@ public class TripodAgent : Agent
 
         target = targetInstance.transform;
         previousDistanceToTarget = Vector3.Distance(transform.position, target.position);
-    }
-
-    private void FixedUpdate()
-    {
-        //if(bodyRigidbody.linearVelocity.magnitude > speed)
-        //{
-        //    speed = bodyRigidbody.linearVelocity.magnitude;
-        //    Debug.Log("New max speed: " + speed);
-        //}
-
     }
 
     private System.Collections.IEnumerator ReenablePhysics()

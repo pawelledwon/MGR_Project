@@ -1165,7 +1165,7 @@ MonoBehaviour:
     VectorActionDescriptions: []
     VectorActionSpaceType: 1
     hasUpgradedBrainParametersWithActionSpec: 1
-  m_Model: {fileID: 0}
+  m_Model: {fileID: 5022602860645237092, guid: 93c16a1f21bbcc249a01355297d6ac4d, type: 3}
   m_InferenceDevice: 0
   m_BehaviorType: 0
   m_BehaviorName: TripoidAgent
@@ -1200,7 +1200,10 @@ MonoBehaviour:
   - {fileID: 7350122664173383730}
   - {fileID: 5662046269825556226}
   - {fileID: 1497480382418601403}
+  useFixedSeed: 1
+  randomSeed: 42
   legMovementLimit: 60
+  minTargetSpawnDistance: 3
   arenaSize: 10
   targetPrefab: {fileID: 3533968191968346687, guid: 366af3d49a750bd47b0197b876666a4c, type: 3}
 --- !u!114 &2710239657906259389
@@ -1232,6 +1235,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   agent: {fileID: 1880323993982182378}
   algorithmName: SAC
+  maxEpisodes: 2000
+  actionOverTimeEpisode: 1
 --- !u!1 &7149001866886891421
 GameObject:
   m_ObjectHideFlags: 0
