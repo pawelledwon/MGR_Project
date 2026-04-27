@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using Unity.MLAgents;
 using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
@@ -10,7 +10,7 @@ public class TripodAgent : Agent
 
     [Header("Fizyka Robota")]
     public Rigidbody bodyRigidbody;
-    public HingeJoint[] swingJoints = new HingeJoint[3]; 
+    public HingeJoint[] swingJoints = new HingeJoint[3];
     public HingeJoint[] liftJoints = new HingeJoint[3];
 
     [Header("Parametry Uczenia")]
@@ -18,7 +18,7 @@ public class TripodAgent : Agent
 
     [Header("Cel")]
     public float arenaSize = 10f;
-    public GameObject targetPrefab;   
+    public GameObject targetPrefab;
     private GameObject targetInstance;
     private Transform target;
 
@@ -35,6 +35,13 @@ public class TripodAgent : Agent
 
     private Rigidbody[] swingRbs = new Rigidbody[3];
     private Rigidbody[] liftRbs = new Rigidbody[3];
+
+    private float speed = 0f;
+
+    private float episodeAngleSum = 0f;      
+    private int groundTouchSteps = 0;          
+    private int episodeStepCount = 0;          
+
 
     public override void Initialize()
     {
@@ -61,6 +68,15 @@ public class TripodAgent : Agent
     public override void OnEpisodeBegin()
     {
         if (metrics != null) metrics.OnEpisodeStart();
+
+        // Zapisz metryki poprzedniego epizodu (przypadek MaxStep)
+        if (episodeStepCount > 0)
+            RecordEpisodeMetrics();
+
+        // Reset metryk
+        episodeAngleSum = 0f;
+        groundTouchSteps = 0;
+        episodeStepCount = 0;
 
         if (targetInstance != null)
         {
@@ -150,6 +166,15 @@ public class TripodAgent : Agent
         previousDistanceToTarget = Vector3.Distance(transform.position, target.position);
     }
 
+    private void FixedUpdate()
+    {
+        //if(bodyRigidbody.linearVelocity.magnitude > speed)
+        //{
+        //    speed = bodyRigidbody.linearVelocity.magnitude;
+        //    Debug.Log("New max speed: " + speed);
+        //}
+
+    }
 
     private System.Collections.IEnumerator ReenablePhysics()
     {
@@ -164,25 +189,25 @@ public class TripodAgent : Agent
 
     public override void CollectObservations(VectorSensor sensor)
     {
-        sensor.AddObservation(bodyRigidbody.linearVelocity);   
-        sensor.AddObservation(bodyRigidbody.angularVelocity);  
-        sensor.AddObservation(transform.forward);             
-        sensor.AddObservation(transform.up);                   
+        sensor.AddObservation(bodyRigidbody.linearVelocity);
+        sensor.AddObservation(bodyRigidbody.angularVelocity);
+        sensor.AddObservation(transform.forward);
+        sensor.AddObservation(transform.up);
 
         sensor.AddObservation(isTouchingGround ? 1.0f : 0.0f);
 
         if (target != null)
         {
             Vector3 toTarget = target.position - transform.position;
-            sensor.AddObservation(toTarget.normalized);           
-            sensor.AddObservation(toTarget.magnitude);            
+            sensor.AddObservation(toTarget.normalized);
+            sensor.AddObservation(toTarget.magnitude);
         }
 
         for (int i = 0; i < 3; i++)
         {
             sensor.AddObservation(swingJoints[i].spring.targetPosition / legMovementLimit);
             sensor.AddObservation(liftJoints[i].spring.targetPosition / legMovementLimit);
-            sensor.AddObservation(swingRbs[i].angularVelocity);                            
+            sensor.AddObservation(swingRbs[i].angularVelocity);
             sensor.AddObservation(liftRbs[i].angularVelocity);
         }
     }
@@ -200,13 +225,14 @@ public class TripodAgent : Agent
             float currentDistance = Vector3.Distance(transform.position, target.position);
             float deltaDistance = previousDistanceToTarget - currentDistance;
 
-            AddReward(deltaDistance * 5.0f);               
-            AddReward(-0.001f * currentDistance);           
+            AddReward(deltaDistance * 5.0f);
+            AddReward(-0.001f * currentDistance);
             previousDistanceToTarget = currentDistance;
 
             if (currentDistance < 1.5f)
             {
                 AddReward(5f);
+                RecordEpisodeMetrics();
                 EndEpisode();
             }
         }
@@ -221,11 +247,38 @@ public class TripodAgent : Agent
             if (hit.distance < 0.5f)
             {
                 SetReward(-1f);
+                RecordEpisodeMetrics();
                 EndEpisode();
             }
         }
 
         if (metrics != null) metrics.RecordJitter(actions);
+
+        episodeStepCount++;
+
+        Vector3 velocity = bodyRigidbody.linearVelocity;
+        if (velocity.magnitude > 0.1f && target != null)
+        {
+            Vector3 toTarget = (target.position - transform.position).normalized;
+            float angle = Vector3.Angle(velocity, toTarget);
+            episodeAngleSum += angle;
+        }
+
+        if (isTouchingGround)
+            groundTouchSteps++;
+    }
+
+    private void RecordEpisodeMetrics()
+    {
+        if (episodeStepCount == 0) return;
+
+        float meanAngle = episodeAngleSum / episodeStepCount;
+        float groundContactPct = (float)groundTouchSteps / episodeStepCount * 100f;
+
+        var stats = Academy.Instance.StatsRecorder;
+        stats.Add("Metrics/OrientationAngle", meanAngle);
+        stats.Add("Metrics/GroundContactPct", groundContactPct);
+        stats.Add("Metrics/EpisodeLength", episodeStepCount);
     }
 
     private void ApplyLegAction(HingeJoint joint, float actionValue)
@@ -243,12 +296,14 @@ public class TripodAgent : Agent
         if (collision.gameObject.CompareTag("Wall"))
         {
             AddReward(-0.5f);
+            RecordEpisodeMetrics();
             EndEpisode();
         }
 
         if (collision.gameObject.CompareTag("Goal"))
         {
             AddReward(5f);
+            RecordEpisodeMetrics();
             EndEpisode();
         }
     }
@@ -256,6 +311,7 @@ public class TripodAgent : Agent
     public void OnLegHitWall()
     {
         AddReward(-0.5f);
+        RecordEpisodeMetrics();
         EndEpisode();
     }
 
