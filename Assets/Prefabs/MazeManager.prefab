@@ -308,9 +308,11 @@ MonoBehaviour:
   agent: {fileID: 1207069144520842140}
   target: {fileID: 6378061487088886363}
   usePillarGrid: 1
+  regenerateEachEpisode: 0
+  useFixedSeedSequence: 1
+  baseSeed: 42
   targetsCollected: 0
   extraWallChance: 0.3
-  regenerateEachEpisode: 0
 --- !u!1 &3169459362475086280
 GameObject:
   m_ObjectHideFlags: 0
