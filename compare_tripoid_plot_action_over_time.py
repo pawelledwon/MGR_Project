@@ -25,8 +25,8 @@ for alg_name, file_path in files_to_process.items():
         plt.step(df["Step"], df["Action0_deg"], label=f"Staw 0 (Swing nogi 1)", color="#2980b9", linewidth=2)
             
         plt.title(f"Przebieg sygnału sterującego jednym stawem w epizodzie ({alg_name})", fontsize=14, fontweight="bold")
-        plt.xlabel("Krok decyzyjny (Step)", fontsize=12)
-        plt.ylabel("Kąt wychylenia (stopnie)", fontsize=12)
+        plt.xlabel("Krok decyzyjny", fontsize=12)
+        plt.ylabel("Kąt wychylenia [°]", fontsize=12)
         
         # Sztywne osie, żeby wykresy PPO i SAC miały tę samą skalę do porównania
         plt.ylim(-65, 65) 

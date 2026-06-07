@@ -255,15 +255,15 @@ public class TripodAgent : Agent
 
         AddReward(-0.001f);
 
-        if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 10f))
-        {
-            if (hit.distance < 0.5f)
-            {
-                SetReward(-1f);
-                RecordEpisodeMetrics();
-                EndEpisode();
-            }
-        }
+        // if (Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 10f))
+        // {
+        //     if (hit.distance < 0.5f)
+        //     {
+        //         SetReward(-1f);
+        //         RecordEpisodeMetrics();
+        //         EndEpisode();
+        //     }
+        // }
 
         if (metrics != null) metrics.RecordJitter(actions);
 
